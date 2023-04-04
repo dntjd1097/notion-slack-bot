@@ -4,8 +4,8 @@ from dateutil import parser
 from datetime import datetime, timezone, timedelta
 
 
-#myToken,notion_token,databaseID= api['GDSC_slack_bot'],api["GDSC_notion_token"],api["GDSC_databaseId"]
-myToken,notion_token,databaseID= api['WS_slack_bot'],api["WS_notion_token"],api["WS_databaseId"]
+myToken,notion_token,databaseID= api['GDSC_slack_bot'],api["GDSC_notion_token"],api["GDSC_databaseId"]
+#myToken,notion_token,databaseID= api['WS_slack_bot'],api["WS_notion_token"],api["WS_databaseId"]
 
 def post_message( channel,title,start_date,end_date,position):
     """슬랙 메시지 전송"""
