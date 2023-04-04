@@ -2,10 +2,14 @@ import requests
 from configure import api_key as api
 from dateutil import parser
 from datetime import datetime, timezone, timedelta
- 
+
+
+#myToken,notion_token,databaseID= api['GDSC_slack_bot'],api["GDSC_notion_token"],api["GDSC_databaseId"]
+myToken,notion_token,databaseID= api['WS_slack_bot'],api["WS_notion_token"],api["WS_databaseId"]
+
 def post_message( channel,title,start_date,end_date,position):
     """슬랙 메시지 전송"""
-    myToken = api['slack_bot']
+    
     response = requests.post("https://slack.com/api/chat.postMessage",
         headers={"Authorization": "Bearer "+myToken},
         data={"channel": channel,"text":  ">*_Reminder_*\n"
@@ -18,7 +22,7 @@ def post_message( channel,title,start_date,end_date,position):
     )
 def readDatabase(databaseId, ):
     headers = {
-    "Authorization": "Bearer " + api["notion_token"],
+    "Authorization": "Bearer " + notion_token,
     "Notion-Version": "2022-02-22"
     }
     readUrl = f"https://api.notion.com/v1/databases/{databaseId}/query"
@@ -120,7 +124,7 @@ def readDatabase(databaseId, ):
                             end_date=end_date[:16]
                             end_date=datetime.strptime(end_date, '%Y-%m-%dT%H:%M')
                             end_date=" ~ "+str(end_date.strftime('%Y-%m-%d %I:%M %p'))
-                    print(title,start_date,position,channel)
+                    #print(title,start_date,position,channel)
                         
                     for cn in channel:
                         post_message(cn,title,start_date,end_date,position)
@@ -128,4 +132,4 @@ def readDatabase(databaseId, ):
             except TypeError as e:
                 pass
                 
-readDatabase(api["databaseId"])
+readDatabase(databaseID)
