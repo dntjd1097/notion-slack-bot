@@ -2,10 +2,14 @@ import requests
 from configure import api_key as api
 from dateutil import parser
 from datetime import datetime, timezone, timedelta
- 
+
+
+myToken,notion_token,databaseID= api['GDSC_slack_bot'],api["GDSC_notion_token"],api["GDSC_databaseId"]
+#myToken,notion_token,databaseID= api['WS_slack_bot'],api["WS_notion_token"],api["WS_databaseId"]
+
 def post_message( channel,title,start_date,end_date,position):
     """슬랙 메시지 전송"""
-    myToken = api['slack_bot']
+    
     response = requests.post("https://slack.com/api/chat.postMessage",
         headers={"Authorization": "Bearer "+myToken},
         data={"channel": channel,"text":  ">*_Reminder_*\n"
@@ -18,7 +22,7 @@ def post_message( channel,title,start_date,end_date,position):
     )
 def readDatabase(databaseId, ):
     headers = {
-    "Authorization": "Bearer " + api["notion_token"],
+    "Authorization": "Bearer " + notion_token,
     "Notion-Version": "2022-02-22"
     }
     readUrl = f"https://api.notion.com/v1/databases/{databaseId}/query"
@@ -50,33 +54,36 @@ def readDatabase(databaseId, ):
             for Event in Events:
                 name=Event['name']
                 position.append(name)
-                
+            channel=[]
             for pos in position:
-                if(pos==('Academic' or "Bi-Weekly Review" 
-                    or "Keynote" or "Management" 
-                    or "Offline Event" or "Online Event")):
-                    channel = "#event"
+                if(pos=='Academic' or pos=="Bi-Weekly Review" 
+                    or pos=="Keynote" or pos=="Management" 
+                    or pos=="Offline Event" or pos=="Online Event"):
+                    channel.append("#event")
                     break
-                if(pos==('Backend Event' and 'Client Event' and 'Design Event' and 'Fronted Event' and 'ML Event')):
-                    channel= "#event"
+                if(pos=='Backend Event' and pos=='Client Event' 
+                   and pos=='Design Event' and pos=='Fronted Event' 
+                   and pos=='ML Event'):
+                    channel.append("#event")
+                    break
                 if(pos=='Backend Event'):
-                    channel="#position-backends"
+                    channel.append("#position-backends")
                 if(pos=='Client Event'):
-                    channel="#position-client"
-                if(pos=='Backend Event'):
-                    channel="#position-backends"
+                    channel.append("#position-client")
                 if(pos=='Design Event'):
-                    channel="#design"
-                if(pos=='Fronted Event'):
-                    channel="#position-frontends"
+                    channel.append("#design")
+                if(pos=='Frontend Event'):
+                    channel.append("#position-frontends")
                 if(pos=='ML Event'):
-                    channel="#position-machine-learning"
+                    channel.append("#position-machine-learning")
+            
             position=str(position)
             if(position=="[]"):
-                channel="#event"
+                channel.append("#event")
                 position=""
             
         except IndexError as e:
+            
             
             if title=="":
                 pass
@@ -85,7 +92,8 @@ def readDatabase(databaseId, ):
             if(not end_date):
                 
                 end_date=""
-        except Exception:
+            
+        except Exception as e:
             pass
             
 
@@ -116,10 +124,12 @@ def readDatabase(databaseId, ):
                             end_date=end_date[:16]
                             end_date=datetime.strptime(end_date, '%Y-%m-%dT%H:%M')
                             end_date=" ~ "+str(end_date.strftime('%Y-%m-%d %I:%M %p'))
-                    
-                    post_message(channel,title,start_date,end_date,position)
+                    #print(title,start_date,position,channel)
+                        
+                    for cn in channel:
+                        post_message(cn,title,start_date,end_date,position)
                 check=""    
             except TypeError as e:
                 pass
                 
-readDatabase(api["databaseId"])
+readDatabase(databaseID)
