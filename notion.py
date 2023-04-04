@@ -50,33 +50,36 @@ def readDatabase(databaseId, ):
             for Event in Events:
                 name=Event['name']
                 position.append(name)
-                
+            channel=[]
             for pos in position:
-                if(pos==('Academic' or "Bi-Weekly Review" 
-                    or "Keynote" or "Management" 
-                    or "Offline Event" or "Online Event")):
-                    channel = "#event"
+                if(pos=='Academic' or pos=="Bi-Weekly Review" 
+                    or pos=="Keynote" or pos=="Management" 
+                    or pos=="Offline Event" or pos=="Online Event"):
+                    channel.append("#event")
                     break
-                if(pos==('Backend Event' and 'Client Event' and 'Design Event' and 'Fronted Event' and 'ML Event')):
-                    channel= "#event"
+                if(pos=='Backend Event' and pos=='Client Event' 
+                   and pos=='Design Event' and pos=='Fronted Event' 
+                   and pos=='ML Event'):
+                    channel.append("#event")
+                    break
                 if(pos=='Backend Event'):
-                    channel="#position-backends"
+                    channel.append("#position-backends")
                 if(pos=='Client Event'):
-                    channel="#position-client"
-                if(pos=='Backend Event'):
-                    channel="#position-backends"
+                    channel.append("#position-client")
                 if(pos=='Design Event'):
-                    channel="#design"
-                if(pos=='Fronted Event'):
-                    channel="#position-frontends"
+                    channel.append("#design")
+                if(pos=='Frontend Event'):
+                    channel.append("#position-frontends")
                 if(pos=='ML Event'):
-                    channel="#position-machine-learning"
+                    channel.append("#position-machine-learning")
+            
             position=str(position)
             if(position=="[]"):
-                channel="#event"
+                channel.append("#event")
                 position=""
             
         except IndexError as e:
+            
             
             if title=="":
                 pass
@@ -85,7 +88,8 @@ def readDatabase(databaseId, ):
             if(not end_date):
                 
                 end_date=""
-        except Exception:
+            
+        except Exception as e:
             pass
             
 
@@ -116,8 +120,10 @@ def readDatabase(databaseId, ):
                             end_date=end_date[:16]
                             end_date=datetime.strptime(end_date, '%Y-%m-%dT%H:%M')
                             end_date=" ~ "+str(end_date.strftime('%Y-%m-%d %I:%M %p'))
-                    
-                    post_message(channel,title,start_date,end_date,position)
+                    print(title,start_date,position,channel)
+                        
+                    for cn in channel:
+                        post_message(cn,title,start_date,end_date,position)
                 check=""    
             except TypeError as e:
                 pass
