@@ -12,10 +12,10 @@ def post_message( channel,isToday,title,start_date,end_date,position):
     
     response = requests.post("https://slack.com/api/chat.postMessage",
         headers={"Authorization": "Bearer "+myToken},
-        data={"channel": channel,"text":  ">*"+isToday+"_Reminder_*\n"
+        data={"channel": channel,"text":  "*"+isToday+"_Reminder_*\n"
                         +">*"+title+"*\n"
                         +">"+start_date
-                        +end_date+"\n"
+                        +end_date+" *"+isToday+"*\n"
                         +">"+position+"\n"
                         +"><!channel>"+"\n"
                         }
@@ -130,8 +130,8 @@ def readDatabase(databaseId, ):
                     elif(start_date==today or check == today):
                         isToday = "[Today] "
                     for cn in channel:
-                        #post_message(cn,isToday,title,start_date,end_date,position)
-                        post_message("#bot-lab",isToday,title,start_date,end_date,position)
+                        post_message(cn,isToday,title,start_date,end_date,position)
+                        #post_message("#bot-lab",isToday,title,start_date,end_date,position)
                 check=""    
             except TypeError as e:
                 pass
