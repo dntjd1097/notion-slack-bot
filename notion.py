@@ -7,12 +7,12 @@ from datetime import datetime, timezone, timedelta
 myToken,notion_token,databaseID= api['GDSC_slack_bot'],api["GDSC_notion_token"],api["GDSC_databaseId"]
 #myToken,notion_token,databaseID= api['WS_slack_bot'],api["WS_notion_token"],api["WS_databaseId"]
 
-def post_message( channel,title,start_date,end_date,position):
+def post_message( channel,isToday,title,start_date,end_date,position):
     """슬랙 메시지 전송"""
     
     response = requests.post("https://slack.com/api/chat.postMessage",
         headers={"Authorization": "Bearer "+myToken},
-        data={"channel": channel,"text":  ">*_Reminder_*\n"
+        data={"channel": channel,"text":  ">*"+isToday+"_Reminder_*\n"
                         +">*"+title+"*\n"
                         +">"+start_date
                         +end_date+"\n"
@@ -125,9 +125,12 @@ def readDatabase(databaseId, ):
                             end_date=datetime.strptime(end_date, '%Y-%m-%dT%H:%M')
                             end_date=" ~ "+str(end_date.strftime('%Y-%m-%d %I:%M %p'))
                     #print(title,start_date,position,channel)
-                        
+                    if((start_date==tommorrow or check == tommorrow)):
+                        isToday = "[Tomorrow] "
+                    elif(start_date==today or check == today):
+                        isToday = "[Today] "
                     for cn in channel:
-                        post_message(cn,title,start_date,end_date,position)
+                        post_message(cn,isToday,title,start_date,end_date,position)
                 check=""    
             except TypeError as e:
                 pass
