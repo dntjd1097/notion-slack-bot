@@ -130,7 +130,8 @@ def readDatabase(databaseId, ):
                     elif(start_date==today or check == today):
                         isToday = "[Today] "
                     for cn in channel:
-                        post_message(cn,isToday,title,start_date,end_date,position)
+                        #post_message(cn,isToday,title,start_date,end_date,position)
+                        post_message("#bot-lab",isToday,title,start_date,end_date,position)
                 check=""    
             except TypeError as e:
                 pass
