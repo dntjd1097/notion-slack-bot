@@ -6,6 +6,7 @@ from datetime import datetime, timezone, timedelta
 
 myToken,notion_token,databaseID= api['GDSC_slack_bot'],api["GDSC_notion_token"],api["GDSC_databaseId"]
 #myToken,notion_token,databaseID= api['WS_slack_bot'],api["WS_notion_token"],api["WS_databaseId"]
+#myToken,notion_token,databaseID= api['GDSC_slack_bot'],api["GDSC_notion_token"],api["GDSC_databaseId"]
 
 def post_message( channel,isToday,title,start_date,end_date,position):
     """슬랙 메시지 전송"""
@@ -117,23 +118,31 @@ def readDatabase(databaseId, ):
                             end_date=""
                     else:
                         #print(title)
+                        
                         start_date=start_date[:16]
                         start_date=datetime.strptime(start_date, '%Y-%m-%dT%H:%M')
                         start_date=start_date.strftime('%Y-%m-%d %I:%M %p')
-                        if(end_date!=""):
+                        
+                        if(end_date!=None):
+                            
                             end_date=end_date[:16]
                             end_date=datetime.strptime(end_date, '%Y-%m-%dT%H:%M')
                             end_date=" ~ "+str(end_date.strftime('%Y-%m-%d %I:%M %p'))
-                    #print(title,start_date,position,channel)
+                        else:
+                            end_date=""
+                            
+                    
                     if((start_date==tommorrow or check == tommorrow)):
                         isToday = "[Tomorrow] "
                     elif(start_date==today or check == today):
                         isToday = "[Today] "
                     for cn in channel:
                         post_message(cn,isToday,title,start_date,end_date,position)
+                        
                         #post_message("#bot-lab",isToday,title,start_date,end_date,position)
                 check=""    
             except TypeError as e:
+                #print(e,e.__class__)
                 pass
                 
 readDatabase(databaseID)
