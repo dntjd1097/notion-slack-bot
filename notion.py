@@ -1,110 +1,65 @@
 import requests
-from configure import api_key as api
-from dateutil import parser
 from datetime import datetime, timezone, timedelta
+from configure import NOTION_TOKEN
+from channel import CHANNELS 
+from slack import post_message
 
 
-myToken,notion_token,databaseID= api['GDSC_slack_bot'],api["GDSC_notion_token"],api["GDSC_databaseId"]
-#myToken,notion_token,databaseID= api['WS_slack_bot'],api["WS_notion_token"],api["WS_databaseId"]
-#myToken,notion_token,databaseID= api['GDSC_slack_bot'],api["GDSC_notion_token"],api["GDSC_databaseId"]
-
-def post_message( channel,isToday,title,start_date,end_date,position):
-    """슬랙 메시지 전송"""
+def get_channel(positions):
+    """Return Slack channel based on position"""
     
-    response = requests.post("https://slack.com/api/chat.postMessage",
-        headers={"Authorization": "Bearer "+myToken},
-        data={"channel": channel,"text":  "*"+isToday+"_Reminder_*\n"
-                        +">*"+title+"*\n"
-                        +">"+start_date
-                        +end_date+" *"+isToday+"*\n"
-                        +">"+position+"\n"
-                        +"><!channel>"+"\n"
-                        }
-    )
-def readDatabase(databaseId, ):
-    headers = {
-    "Authorization": "Bearer " + notion_token,
+    #print(CHANNELS["channels"][0])
+    channel=[]
+    for position in positions:
+        if(position in CHANNELS["channels"][0]):
+            return CHANNELS["channels"][0][position]
+        elif(position in CHANNELS["channels"][1]):
+            channel.append(CHANNELS["channels"][1][position])
+    
+    
+    if(positions==[]):
+        return(','.join(CHANNELS["channels"][2]))
+    return channel
+def read_database(database_id):
+    """Read events from Notion database and post reminders to Slack"""
+    HEADERS = {
+    "Authorization": f"Bearer {NOTION_TOKEN}",
     "Notion-Version": "2022-02-22"
     }
-    readUrl = f"https://api.notion.com/v1/databases/{databaseId}/query"
+    response = requests.post(
+        f"https://api.notion.com/v1/databases/{database_id}/query",
+        headers=HEADERS,
+    )
 
-    res = requests.post(readUrl, headers=headers)
-    datas = res.json()
-    
-            
-    today = timezone(timedelta(hours=9))
-    today = datetime.now(today)
-    today = str(today)[:10]
-
-    tommorrow = timezone(timedelta(hours=9))
-    tommorrow = datetime.now(tommorrow)+ timedelta(1)
-    tommorrow = str(tommorrow)[:10]
-
-    week = timezone(timedelta(hours=9))
-    week = datetime.now(week)+ timedelta(7)
-    week = str(week)[:10]
-   
-    for data in datas['results']:
+    datas = response.json()["results"]
+    today = datetime.now(timezone(timedelta(hours=9))).strftime("%Y-%m-%d")
+    tomorrow = (datetime.now(timezone(timedelta(hours=9))) +
+                timedelta(1)).strftime("%Y-%m-%d")
+    week = (datetime.now(timezone(timedelta(hours=9))) +
+                timedelta(7)).strftime("%Y-%m-%d")
+    for data in datas:
         try:
-            title,start_date,end_date,position="","","",""
-            title=data["properties"]["Name"]["title"][0]['plain_text']
-            start_date=data["properties"]["Date"]['date']['start']
-            end_date=data["properties"]["Date"]['date']['end']
-            position=[]
-            Events=data["properties"]["Event Type"]["multi_select"]
-            for Event in Events:
-                name=Event['name']
-                position.append(name)
-            channel=[]
-            for pos in position:
-                if(pos=='Academic' or pos=="Bi-Weekly Review" 
-                    or pos=="Keynote" or pos=="Management" 
-                    or pos=="Offline Event" or pos=="Online Event"):
-                    channel.append("#event")
-                    break
-                if(pos=='Backend Event' and pos=='Client Event' 
-                   and pos=='Design Event' and pos=='Fronted Event' 
-                   and pos=='ML Event'):
-                    channel.append("#event")
-                    break
-                if(pos=='Backend Event'):
-                    channel.append("#position-backends")
-                if(pos=='Client Event'):
-                    channel.append("#position-client")
-                if(pos=='Design Event'):
-                    channel.append("#design")
-                if(pos=='Frontend Event'):
-                    channel.append("#position-frontends")
-                if(pos=='ML Event'):
-                    channel.append("#position-machine-learning")
             
-            position=str(position)
-            if(position=="[]"):
-                channel.append("#event")
-                position=""
+            title = data["properties"]["Name"]["title"][0]["plain_text"]
+            start_date = data["properties"]["Date"]["date"]["start"]
+            end_date = data["properties"]["Date"]["date"].get("end")
+            url=data["url"]
+            positions = [p["name"]
+                        for p in data["properties"]["Event Type"]["multi_select"]]
             
-        except IndexError as e:
-            
-            
-            if title=="":
-                pass
-            else:
-                position=""
-            if(not end_date):
-                
-                end_date=""
+
+            channel = (get_channel(positions))
             
         except Exception as e:
+            #print(e,title)
             pass
-            
 
-        
         if (title!="" and start_date!=""):
             try:
                 
                 check=start_date[:10]
                 #시간 계산
-                if((start_date==tommorrow or check == tommorrow)
+                if((start_date==tomorrow or check == tomorrow)
                     or(start_date==today or check == today)
                     #or(start_date==week or check == week)
                     ):
@@ -132,17 +87,25 @@ def readDatabase(databaseId, ):
                             end_date=""
                             
                     
-                    if((start_date==tommorrow or check == tommorrow)):
-                        isToday = "[Tomorrow] "
+                    if((start_date==tomorrow or check == tomorrow)):
+                        isToday = "[내일] "
                     elif(start_date==today or check == today):
-                        isToday = "[Today] "
-                    for cn in channel:
-                        post_message(cn,isToday,title,start_date,end_date,position)
-                        
+                        isToday = "[오늘] "
+                    
+
+                    
+                    positions=', '.join(positions)
+                    
+                    #print(type(positions),positions)
+                    if(type(channel)==list):
+                        for cn in channel:
+                            post_message(cn,isToday,title,start_date,end_date,positions,url)
+                    else:
+                        post_message(channel,isToday,title,start_date,end_date,positions,url)
                         #post_message("#bot-lab",isToday,title,start_date,end_date,position)
                 check=""    
             except TypeError as e:
                 #print(e,e.__class__)
                 pass
-                
-readDatabase(databaseID)
+
+
