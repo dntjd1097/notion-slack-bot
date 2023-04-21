@@ -3,7 +3,7 @@ from datetime import datetime, timezone, timedelta
 from configure import NOTION_TOKEN
 from channel import CHANNELS 
 from slack import post_message
-
+from cal import calender
 
 def get_channel(positions):
     """Return Slack channel based on position"""
