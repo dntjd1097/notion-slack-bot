@@ -55,7 +55,7 @@ def post_message(channel, isToday, title, start_date, end_date, position, url):
                 file=file_content,
                 filename=title + ".ics",
                 thread_ts=latest_ts,
-                # initial_comment='iCal 파일입니다.'
+                initial_comment="맥os, 아이패드 , 윈도우 밖에 안열려요 ㅠㅠ",
             )
 
         os.remove(file_path)
