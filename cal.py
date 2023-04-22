@@ -5,19 +5,29 @@ import pytz
 
 # 캘린더 생성
 def calender(title, start, end, url):
-    # print(title, start, end)
     try:
-        # print(title, start, end)
         if start == start[:10]:
             start_date = datetime.strptime(start, "%Y-%m-%d").date()
-            end_date = datetime.strptime(end, "%Y-%m-%d").date()
+            end_date = datetime.strptime(end, "%Y-%m-%d").date() + timedelta(1)
         else:
-            # print(start, end)
-            # start = start[:16], end = end[:16]
             start_date = start[:16]
             start_date = datetime.strptime(start_date, "%Y-%m-%dT%H:%M")
             end_date = end[:16]
             end_date = datetime.strptime(end_date, "%Y-%m-%dT%H:%M")
+
+        cal = Calendar()
+        cal.add("prodid", "-//My Calendar//example.com//EN")
+        cal.add("version", "2.0")
+        cal.add("method", "PUBLISH")
+        KST = pytz.timezone("Asia/Seoul")
+        # 이벤트 생성
+        event = Event()
+        event.add("uid", "dntjd1097@gmail.com")
+        event.add("summary", title)
+
+        event.add("dtstamp", datetime.now(tz=KST))
+        event.add("dtstart", start_date)
+        event.add("dtend", end_date)
 
         event.add("description", url)
         cal.add_component(event)

@@ -3,7 +3,7 @@ from configure import MY_TOKEN
 import os
 
 
-async def post_message(channel, isToday, title, start_date, end_date, position, url):
+def post_message(channel, isToday, title, start_date, end_date, position, url):
     """슬랙 메시지 전송"""
     client = WebClient(token=MY_TOKEN)
 
@@ -58,7 +58,7 @@ async def post_message(channel, isToday, title, start_date, end_date, position, 
                 # initial_comment='iCal 파일입니다.'
             )
 
-        # os.remove(file_path)
+        os.remove(file_path)
     except FileNotFoundError as e:
         print("Error: %s : %s" % ("my_calendar.ics", e.strerror))
     except UnboundLocalError as e:

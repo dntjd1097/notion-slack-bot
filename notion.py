@@ -102,25 +102,11 @@ def read_database(database_id):
 
                     # print(type(positions),positions)
                     # create_event(title, start_date, end_date, url)
-                    print("전송")
+                    # print("전송")
                     if type(channel) == list:
                         for cn in channel:
-                            asyncio.run(
-                                post_message(
-                                    cn,
-                                    isToday,
-                                    title,
-                                    start_date,
-                                    end,
-                                    positions,
-                                    url,
-                                )
-                            )
-
-                    else:
-                        asyncio.run(
                             post_message(
-                                channel,
+                                cn,
                                 isToday,
                                 title,
                                 start_date,
@@ -128,8 +114,19 @@ def read_database(database_id):
                                 positions,
                                 url,
                             )
+
+                    else:
+                        post_message(
+                            channel,
+                            isToday,
+                            title,
+                            start_date,
+                            end,
+                            positions,
+                            url,
                         )
-                        # post_message("#bot-lab",isToday,title,start_date,end_date,position)
+
+                    # post_message("#bot-lab",isToday,title,start_date,end_date,position)
                 check = ""
             except TypeError as e:
                 pass
