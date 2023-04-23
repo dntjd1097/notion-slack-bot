@@ -5,7 +5,7 @@ CLIENT_EVENT = "C040Q0N033J"
 DESIGN_EVENT = "C02T71RE9B9"
 FRONTED_EVENT = "C046KT6K2NB"
 ML_EVENT = "C04FBG664J2"
-
+TEST = "C03P45HG7B9"
 CHANNELS = {
     "channels": [
         #  왼쪽은 노션 Event Type : 오른쪽은 그냥 변수
@@ -25,6 +25,7 @@ CHANNELS = {
             "Design Event": DESIGN_EVENT,
             "Frontend Event": FRONTED_EVENT,
             "ML Event": ML_EVENT,
+            "bot-lab": TEST,
         },
         {EVENT},  # 아무 멘션 없을 시 EVENT 채널에
     ]
