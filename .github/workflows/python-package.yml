@@ -13,12 +13,14 @@ jobs:
   build:
 
     runs-on: [self-hosted, linux, x64]
-    env:
-        working-directory: ~/GDSC/notion-slack-bot
+
     steps:
     - name: Install dependencies
       run: |
+        cd ~/GDSC/
+        pwd
+        ls -al
         git pull
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      working-directory: ${{ env.working-directory }}
+
