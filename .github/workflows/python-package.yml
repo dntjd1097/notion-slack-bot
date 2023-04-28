@@ -17,7 +17,7 @@ jobs:
     steps:
     - name: Install dependencies
       run: |
-        cd ~/GDSC/
+        cd ~/GDSC/notion-slack-bot/
         pwd
         ls -al
         git pull
