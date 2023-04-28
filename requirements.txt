@@ -2,4 +2,3 @@ icalendar
 requests
 datetime
 slack_sdk
-pyupbit
