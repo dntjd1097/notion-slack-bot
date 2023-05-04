@@ -5,8 +5,8 @@ CLIENT_EVENT = "C040Q0N033J"
 DESIGN_EVENT = "C02T71RE9B9"
 FRONTED_EVENT = "C046KT6K2NB"
 ML_EVENT = "C04FBG664J2"
-TEST = "C03P45HG7B9"
-
+BOT_LAB = "C03P45HG7B9"
+WAKATIME = "C04Q2CRRTMZ"
 # # WS
 # EVENT = "C051QNA9AG3"
 # BACKEND_EVENT = "C052EGG4J0G"
@@ -34,7 +34,7 @@ CHANNELS = {
             "Design Event": DESIGN_EVENT,
             "Frontend Event": FRONTED_EVENT,
             "ML Event": ML_EVENT,
-            "bot-lab": TEST,
+            "bot-lab": BOT_LAB,
         },
         {EVENT},  # 아무 멘션 없을 시 EVENT 채널에
     ]
