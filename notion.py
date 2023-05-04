@@ -1,4 +1,6 @@
 import requests
+import time
+import os
 from datetime import datetime, timezone, timedelta
 from configure import NOTION_TOKEN
 from channel import CHANNELS
@@ -44,9 +46,11 @@ def read_database(database_id):
     week = (datetime.now(timezone(timedelta(hours=9))) + timedelta(7)).strftime(
         "%Y-%m-%d"
     )
+    print(response)
     for data in datas:
         try:
             title = data["properties"]["Name"]["title"][0]["plain_text"]
+            file_path = title + ".ics"
             start_date = data["properties"]["Date"]["date"]["start"]
             end_date = data["properties"]["Date"]["date"].get("end")
             url = data["url"]
@@ -64,13 +68,12 @@ def read_database(database_id):
             try:
                 check = start_date[:10]
                 # 시간 계산
+
                 if (
                     (start_date == tomorrow or check == tomorrow)
                     or (start_date == today or check == today)
-                    # or(start_date==week or check == week)
+                    or (start_date == week or check == week)
                 ):
-                    # print(title, start_date, end_date)
-                    # 시작시간 = 2023-04-05
                     if end_date == None:
                         end_date = start_date
                         end = ""
@@ -91,17 +94,13 @@ def read_database(database_id):
                         end = " ~ " + str(end_date)
 
                     if start_date == tomorrow or check == tomorrow:
-                        isToday = "[내일] "
+                        isToday = "[내일]"
                     elif start_date == today or check == today:
-                        isToday = "[오늘] "
-
+                        isToday = "[오늘]"
+                    elif start_date == week or check == week:
+                        isToday = "[다음 주]"
                     positions = ", ".join(positions)
-                    # print("전송중")
-                    # print(title, start_date, end_date)
 
-                    # print(type(positions),positions)
-                    # create_event(title, start_date, end_date, url)
-                    # print("전송")
                     if type(channel) == list:
                         for cn in channel:
                             post_message(
@@ -112,8 +111,8 @@ def read_database(database_id):
                                 end,
                                 positions,
                                 url,
+                                file_path,
                             )
-
                     else:
                         post_message(
                             channel,
@@ -123,9 +122,12 @@ def read_database(database_id):
                             end,
                             positions,
                             url,
+                            file_path,
                         )
 
+                    os.remove(file_path)
                     # post_message("#bot-lab",isToday,title,start_date,end_date,position)
                 check = ""
             except TypeError as e:
+                print(e)
                 pass
